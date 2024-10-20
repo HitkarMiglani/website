@@ -1,0 +1,44 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/CSS" href="{% static '/home/css/login_signup.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="icon" type="image/png" href="{% static 'home/img/logo.png' %}"> 
+    <title>Login Page</title>
+</head>
+<body>
+  
+  {% if error %}
+  <div class="alert alert-danger"><strong>{{error}}</strong></div>
+  {% endif %}
+    
+
+  <div class="form-container" style = "height: fit-content;  margin: auto; margin-top: 20vh;">
+    
+    <!-- Sign Up Form -->
+    <p class="title">Welcome Again</p>
+    <p class="sub-title">Keep your mind relaxed</p>
+    <form class="form" method="post" action="/login">
+      {% csrf_token %}
+      <input type="text" class="input" name="name" placeholder="Name" required>
+      <input type="password" class="input" name="password" placeholder="Password" required>
+      <button type="submit" class="form-btn">Login to account</button>
+    </form>
+    <p class="sign-up-label">
+      Don't have an account?<span class="sign-up-link"><a href="/signup">Sign up</a></span>
+    </p>
+    <div class="buttons-container">
+      <div class="google-login-button">
+        <a href="{% provider_login_url 'google'%}?next=http://localhost:3000/">
+          <i class="fab fa-google"></i>
+          Login with Google
+       </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
