@@ -22,7 +22,7 @@
     <!-- Sign Up Form -->
     <p class="title">Welcome Again</p>
     <p class="sub-title">Keep your mind relaxed</p>
-    <form class="form" method="post" action="/login">
+    <form class="form" method="POST" action="{% url 'login' %}">
       {% csrf_token %}
       <input type="text" class="input" name="name" placeholder="Name" required>
       <input type="password" class="input" name="password" placeholder="Password" required>

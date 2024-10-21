@@ -3,10 +3,14 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate , login
+from django.contrib.auth import authenticate, login, logout
 from datetime import datetime
 from django.contrib.auth.hashers import make_password
 
+
+def logou(request):
+    logout(request)
+    return redirect("http://127.0.0.1:8000/login")
 
 def logi(request):
     if request.method == "POST":
@@ -14,11 +18,11 @@ def logi(request):
         password = (request.POST['password'])
         global user
         user = authenticate(request, username=name , password=password)
-        print(user)
+        print(request)
         try:
             if user is not None:
                 login(request,user)  
-                # return render(request,'iindex.html')
+                redir(request)
             else :
                 context = {'error':'Username or Password is incorrect'}
                 template = loader.get_template('login.html')

@@ -40,6 +40,7 @@ class Patients(models.Model):
         return f"{self.PID} {self.Name}"
     
 class CognitiveExercise(models.Model):
+    key = models.AutoField(primary_key=True,default=0)
     name = models.CharField(max_length=255)
     description = models.TextField()
     difficulty = models.CharField(max_length=50)  # Easy, Medium, Hard
@@ -48,6 +49,7 @@ class CognitiveExercise(models.Model):
 
 class UserExerciseProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    PID = models.ForeignKey(Patients, on_delete=models.CASCADE)
     exercise = models.ForeignKey(CognitiveExercise, on_delete=models.CASCADE)
     score = models.IntegerField()
     date_completed = models.DateTimeField(auto_now_add=True)

@@ -1,33 +1,32 @@
-import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import CognitiveExercise, UserExerciseProgress
-from .serializers import CognitiveExerciseSerializer, UserExerciseProgressSerializer
 import numpy as np
 import tensorflow as tf
 import cv2 as cv
+from django.views.decorators.http import require_POST
+from .models import CognitiveExercise
 from keras.models import model_from_json # type: ignore
+
 
 IMAGE_SIZE = [176,208]
 
 def return_user(request):
-    # data = {'user':request.user.username}
-    # with open('data.json', 'w') as outfile:
-    #     json.dump(data, outfile)
     if request.method == "POST":
         print(request.user.username)
         return JsonResponse({'user': request.user.username})
     else:
-        print(request.user.username)
-        return JsonResponse({'user':'wrong method'})
+        # print(request.user.usrname)
+        return JsonResponse({'user':'Hitkar'})
 
 def load_image(fname):
     
@@ -81,20 +80,12 @@ def upload_and_predict(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 # Cognitive Exercises ViewSet
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from .models import CognitiveExercise, UserExerciseProgress
-
 # Cognitive Exercises View
 @csrf_exempt
 def cognitive_exercise_list(request):
     """ List all cognitive exercises """
     exercises = (list(CognitiveExercise.objects.values('name','description','type','difficulty')))
-    print(exercises)# Directly get values as dicts
+    # print(exercises)# Directly get values as dicts
     return JsonResponse({'exercises' : exercises},safe=False)  # Return the list of dicts
 
 @api_view(['GET'])
@@ -149,3 +140,33 @@ def user_exercise_progress_retrieve(request, pk):
         # Add other fields if necessary
     }
     return Response(progress_data)
+
+@require_POST
+@csrf_exempt
+def add_exercise(request):
+    """ Add a new cognitive exercise """
+    data = request.POST
+    name = data.get('name')
+    description = data.get('description')
+    difficulty = data.get('difficulty')
+    exercise_type = data.get('type')
+
+    if not all([name, description, exercise_type, difficulty]):
+        return JsonResponse({'error': 'All fields are required'}, status=400)
+
+    exercise = CognitiveExercise.objects.create(
+        name=name,
+        description=description,
+        type=exercise_type,
+        difficulty=difficulty
+    )
+
+    exercise_data = {
+        'id': exercise.id,
+        'name': exercise.name,
+        'description': exercise.description,
+        'type': exercise.type,
+        'difficulty': exercise.difficulty,
+    }
+
+    return JsonResponse(exercise_data, status=201)
