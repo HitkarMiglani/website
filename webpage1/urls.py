@@ -10,6 +10,7 @@ urlpatterns = [
     path('exercises/d',cognitive_exercise_retrieve, name="lsit"),
     path('progress/', user_exercise_progress_list,name='progress'),
     path('progress/d', user_exercise_progress_retrieve, name='progress_list'),
+    path('addExercise/',add_exercise,name='add_exercise'),
 
 ]
 

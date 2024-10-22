@@ -145,6 +145,9 @@ def user_exercise_progress_retrieve(request, pk):
 @csrf_exempt
 def add_exercise(request):
     """ Add a new cognitive exercise """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
     data = request.POST
     name = data.get('name')
     description = data.get('description')
@@ -153,13 +156,19 @@ def add_exercise(request):
 
     if not all([name, description, exercise_type, difficulty]):
         return JsonResponse({'error': 'All fields are required'}, status=400)
-
-    exercise = CognitiveExercise.objects.create(
-        name=name,
-        description=description,
-        type=exercise_type,
-        difficulty=difficulty
-    )
+    if CognitiveExercise.objects.filter(name=name).exists():
+        return JsonResponse({'error': 'Exercise with this name already exists'}, status=400)
+    
+    try:
+        exercise = CognitiveExercise(
+            name=name,
+            description=description,
+            type=exercise_type,
+            difficulty=difficulty
+        )
+        exercise.save()
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
     exercise_data = {
         'id': exercise.id,
