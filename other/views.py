@@ -22,7 +22,7 @@ def logi(request):
         try:
             if user is not None:
                 login(request,user)  
-                redir(request)
+                return redirect("http://localhost:3000/")
             else :
                 context = {'error':'Username or Password is incorrect'}
                 template = loader.get_template('login.html')
@@ -63,9 +63,9 @@ def signup(request):
 
 
 def redir(request):
-    data = {'user':user}
-    with open('data.json', 'w') as outfile:
-        print("Writing to file")
-        json.dump(data, outfile)
+    # data = {'user':user}
+    # with open('data.json', 'w') as outfile:
+    #     print("Writing to file")
+    #     json.dump(data, outfile)
                 
     return redirect("http://localhost:3000/")

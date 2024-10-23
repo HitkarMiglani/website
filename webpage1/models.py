@@ -12,6 +12,7 @@ class Patients(models.Model):
         (1, 'Yes'),
     ]
     
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True,default=0)
     Age = models.IntegerField(blank=False)
     # PID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,6 +30,7 @@ class Patients(models.Model):
     ADL = models.FloatField(blank=False, null=False,default=0.00)
     Disorientation = models.IntegerField(choices=YES_NO_CHOICES,default=0)
     PersonalityChanges = models.IntegerField(choices=YES_NO_CHOICES,default=0)
+    Predection = models.CharField(max_length=255,default="None")
 
     def save(self, *args, **kwargs):
         if not self.PID:

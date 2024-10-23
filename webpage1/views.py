@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import CognitiveExercise, UserExerciseProgress
+from .models import CognitiveExercise, UserExerciseProgress , Patients
 import numpy as np
 import tensorflow as tf
 import cv2 as cv
@@ -179,3 +179,10 @@ def add_exercise(request):
     }
 
     return JsonResponse(exercise_data, status=201)
+
+@csrf_exempt
+def patients(request):
+    """ List all cognitive exercises """
+    patients = (list(Patients.objects.values().all()))
+    # print(exercises)# Directly get values as dicts
+    return JsonResponse({'patients' : patients},safe=False)
