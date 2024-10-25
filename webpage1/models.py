@@ -44,8 +44,8 @@ class CognitiveExercise(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True, blank=False)
     description = models.TextField()
-    difficulty = models.CharField(max_length=50)  # Easy, Medium, Hard
-    type = models.CharField(max_length=100)  # Memory, Puzzle, etc.
+    difficulty = models.CharField(max_length=50) 
+    type = models.CharField(max_length=100)  
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
