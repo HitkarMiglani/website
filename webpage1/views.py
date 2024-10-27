@@ -84,62 +84,9 @@ def upload_and_predict(request):
 @csrf_exempt
 def cognitive_exercise_list(request):
     """ List all cognitive exercises """
-    exercises = (list(CognitiveExercise.objects.values('name','description','type','difficulty')))
+    exercises = (list(CognitiveExercise.objects.values('id','name','description','type','difficulty')))
     # print(exercises)# Directly get values as dicts
     return JsonResponse({'exercises' : exercises},safe=False)  # Return the list of dicts
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def cognitive_exercise_retrieve(request, pk=1):
-    """ Retrieve a specific cognitive exercise by its ID """
-    exercise = get_object_or_404(CognitiveExercise, pk=pk)
-    exercise_data = {
-        'id': exercise.id,
-        'name': exercise.name,
-        'description': exercise.description,
-        # Add other fields if necessary
-    }
-    return Response(exercise_data)
-
-# User Progress View
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def user_exercise_progress_list(request):
-    """ List all progress for the authenticated user """
-    user = request.user
-    progress = UserExerciseProgress.objects.filter(user=user).values()  # Directly get progress data as dicts
-
-    if request.method == 'GET':
-        return Response(list(progress))
-
-    if request.method == 'POST':
-        data = request.data.copy()
-        data['user'] = user.id
-        # Assuming all fields are provided in request data
-        new_progress = UserExerciseProgress.objects.create(**data)
-        new_progress_data = {
-            'id': new_progress.id,
-            'user': new_progress.user.id,
-            'exercise': new_progress.exercise.id,
-            'progress': new_progress.progress,
-            # Add other fields if necessary
-        }
-        return Response(new_progress_data, status=status.HTTP_201_CREATED)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def user_exercise_progress_retrieve(request, pk):
-    """ Retrieve progress for a specific exercise """
-    user = request.user
-    progress = get_object_or_404(UserExerciseProgress, user=user, exercise_id=pk)
-    progress_data = {
-        'id': progress.id,
-        'user': progress.user.id,
-        'exercise': progress.exercise.id,
-        'progress': progress.progress,
-        # Add other fields if necessary
-    }
-    return Response(progress_data)
 
 @require_POST
 @csrf_exempt
@@ -183,6 +130,56 @@ def add_exercise(request):
 @csrf_exempt
 def patients(request):
     """ List all cognitive exercises """
+    if request.method == "POST":
+        data = request.POST
+        user = data.get('user')
+        name = data.get('name')
+        age = data.get('age')
+        gender = data.get('gender')
+        smoking = data.get('smoking')
+        hypertension = data.get('hypertension')
+        cholestrol_total = data.get('cholestrol_total')
+        cholestrol_hdl = data.get('cholestrol_hdl')
+        msme = data.get('msme')
+        functional_assessment = data.get('functional_assessment')
+        memory_complaints = data.get('memory_complaints')
+        behavioral_problems = data.get('behavioral_problems')
+        adl = data.get('adl')
+        disorientation = data.get('disorientation')
+        personality_changes = data.get('personality_changes')
+        prediction = data.get('prediction')
+
+        if not all([user, name, age, gender, smoking, hypertension, cholestrol_total, cholestrol_hdl, msme, functional_assessment, memory_complaints, behavioral_problems, adl, disorientation, personality_changes, prediction]):
+            return JsonResponse({'error': 'All fields are required'}, status=400)
+        if CognitiveExercise.objects.filter(Name=name).exists():
+            return JsonResponse({'error': 'Exercise with this name already exists'}, status=400)
+        
+        try:
+            exercise = CognitiveExercise(
+                user=user,
+                Name=name,
+                Age=age,
+                Gender=gender,
+                Smoking=smoking,
+                Hypertension=hypertension,
+                CholestrolTotal=cholestrol_total,
+                CholestrolHDL=cholestrol_hdl,
+                MSME=msme,
+                FunctionalAssessment=functional_assessment,
+                MemoryComplaints=memory_complaints,
+                BehavioralProblems=behavioral_problems,
+                ADL=adl,
+                Disorientation=disorientation,
+                PersonalityChanges=personality_changes,
+                Predection=prediction
+            )
+            exercise.save()
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+        Patients_data = (list(Patients.objects.values().all()))
+        return JsonResponse({'patients' : Patients_data}, safe=False)
+    
     patients = (list(Patients.objects.values().all()))
     # print(exercises)# Directly get values as dicts
     return JsonResponse({'patients' : patients},safe=False)

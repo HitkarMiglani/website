@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 
 class Patients(models.Model):
     GENDER_CHOICES = [
@@ -12,10 +15,9 @@ class Patients(models.Model):
         (1, 'Yes'),
     ]
     
+    id = models.AutoField(primary_key=True,unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    id = models.AutoField(primary_key=True,default=0)
     Age = models.IntegerField(blank=False)
-    # PID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     PID = models.CharField(max_length=10, unique=True, editable=False)
     Name = models.CharField(max_length=50,default="")
     Gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=False,default='M')
@@ -32,14 +34,34 @@ class Patients(models.Model):
     PersonalityChanges = models.IntegerField(choices=YES_NO_CHOICES,default=0)
     Predection = models.CharField(max_length=255,default="None")
 
+    
     def save(self, *args, **kwargs):
+        """
+        Overrides the save method to automatically generate a PID if it does not exist.
+        
+        The PID is generated in the format "P_XXXXX" where XXXXX is the zero-padded ID incremented by 1.
+        
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         if not self.PID:
-            self.PID = f"P_{self.id:05d}"
+            self.PID = f"P_{(self.id):05d}"
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.PID} {self.Name}"
     
+@receiver(pre_save, sender=Patients)
+def set_patient_pid(sender, instance, **kwargs):
+    if not instance.PID:
+        last_patient = Patients.objects.all().order_by('id').last()
+        if last_patient:
+            instance.id = last_patient.id + 1
+        else:
+            instance.id = 1
+        instance.PID = f"P_{instance.id:05d}"
+
 class CognitiveExercise(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True, blank=False)
