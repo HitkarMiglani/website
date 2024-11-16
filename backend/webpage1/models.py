@@ -36,15 +36,6 @@ class Patients(models.Model):
 
     
     def save(self, *args, **kwargs):
-        """
-        Overrides the save method to automatically generate a PID if it does not exist.
-        
-        The PID is generated in the format "P_XXXXX" where XXXXX is the zero-padded ID incremented by 1.
-        
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-        """
         if not self.PID:
             self.PID = f"P_{(self.id):05d}"
         super().save(*args, **kwargs)

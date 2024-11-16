@@ -1,5 +1,14 @@
 from rest_framework import serializers, viewsets
-from .models import CognitiveExercise, UserExerciseProgress
+from .models import CognitiveExercise, UserExerciseProgress,Patients;
+
+class PatientsSerializer(serializers.ModelSerializer):
+    class Mets:
+        model = Patients
+        fields = ['PID', 'Name', 'Age', 'Gender', 'Diagnosis']
+
+class PatientsViewSet(viewsets.ModelViewSet):
+    queryset = Patients.objects.all()
+    serializer_class = PatientsSerializer
 
 class CognitiveExerciseSerializer(serializers.ModelSerializer):
     class Meta:
