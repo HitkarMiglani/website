@@ -41,18 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
     'corsheaders',
     'webpage1',
-    'other'
 ]
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend'
+    # 'allauth.account.auth_backends.AuthenticationBackend'
     ]
 
 MIDDLEWARE = [
@@ -64,29 +59,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware', 
+    # 'allauth.account.middleware.AccountMiddleware', 
 ]
 
 LOGIN_REDIRECT_URL = "http://localhost:3000/"
-
-SOCIALACCOUNT_LOGIN_ON_GET=True
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'APP':{
-            'client_id': os.environ['CLIENT_ID'], # in .env file
-            'secret': os.environ['CLIENT_SECRET'], # in .env file
-        },
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
-    }
-}
-
 
 ROOT_URLCONF = 'website.urls'
 
