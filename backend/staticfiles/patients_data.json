@@ -1,0 +1,19 @@
+{
+    "P_00002": [
+               {
+                "smoking": "No",
+                "hypertension": "No",
+                "cholesterol_total": "No",
+                "cholesterol_hdl": "No",
+                "msme" : "No",
+                "functional_assessment": "No",
+                "memory_complaint": "No",
+                "behavioral_complaint": "No",
+                "adl": "No",
+                "disorientation": "No",
+                "personality_change": "No",
+                "date": "2021-06-01",
+                "predection": ""   
+            }
+                ]
+}
