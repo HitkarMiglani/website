@@ -25,6 +25,7 @@ class AIModel:
         self.model = model_from_json(model_json)
         self.model.load_weights("../models/model_json.keras")
 
+    @staticmethod
     def load_image(fname):
         print(fname)
         img = cv.imread(fname)
@@ -55,7 +56,6 @@ class TextModel:
     def predict(self, data:pd.DataFrame):
         pred = self.model.predict(data)
         pred = np.argmax(pred)
-        # return pred
         
         return 'Text prediction '
 
