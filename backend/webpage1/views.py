@@ -125,9 +125,7 @@ def patient_data(request):
         
         if not smoaking:
             with open(file_path, 'r') as json_file:
-                json_file_data = json.load(json_file)
-                patient_data = json_file_data.get(PID)
-            return JsonResponse(patient_data, status=200, safe=False)
+                return JsonResponse(json.load(json_file).get(PID), status=200, safe=False)
         
             
         
