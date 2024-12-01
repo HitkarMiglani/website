@@ -10,8 +10,11 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 from .models import Patients
 import numpy as np
 import cv2 as cv
-from django.views.decorators.http import require_POST
-from keras.models import model_from_json # type: ignore
+from keras.models import model_from_json# type: ignore 
+from keras.models import Sequential #type: ignore
+
+class CustomSequential(Sequential):
+    pass
 
 file_path = r'.\staticfiles\patients_data.json'
 
@@ -19,12 +22,12 @@ IMAGE_SIZE = [176,208]
 
 class AIModel:
     def __init__(self):
-        json_file = open("../models/model_json.json", "r")
+        json_file = open('model_mri.json', 'r')
         model_json = json_file.read()
         json_file.close()
-        self.model = model_from_json(model_json)
-        self.model.load_weights("../models/model_json.keras")
-
+        model = model_from_json(model_json, custom_objects={'CustomSequential': CustomSequential})
+        model.load_weights("model_mri.h5")
+    
     @staticmethod
     def load_image(fname):
         print(fname)
@@ -83,7 +86,7 @@ def patients(request):
         data = request.POST
         user_id = data.get('user_id')
         patiens = Patients.objects.filter(user_id=user_id)
-        return JsonResponse({'patients' : list(patiens.values())},safe=False)
+        return JsonResponse(list(patiens.values()),safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
@@ -92,22 +95,17 @@ def add_patient(request):
     if request.method == 'POST':
         data = request.POST
         user_id = data.get('user_id')
-        user_name = data.get('user_name')
         name = data.get('name')
         age = data.get('age')
         gender = data.get('gender')
         
-        # print(user_id, user_name, name, age,gender)
-        with open(file_path, 'w') as json_file:
-            file = json.load(json_file)
-            file[user_id] = {}
-            
+        print(name,age,gender,user_id)
 
-        if not all([user_id, user_name, name, age,gender]):
+        if not all([user_id, name, age,gender]):
             return JsonResponse({'error': 'All fields are required'}, status=400)
 
         try:
-            patient = Patients(user_id=user_id, user_name=user_name, Name=name, Age=age,Gender=gender)
+            patient = Patients(user_id=user_id,Name=name, Age=age,Gender=gender)
             patient.save()
             
             return JsonResponse({'message': 'Patient added successfully'}, status=201)
