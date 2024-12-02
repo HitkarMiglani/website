@@ -10,11 +10,8 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 from .models import Patients
 import numpy as np
 import cv2 as cv
-from keras.models import model_from_json# type: ignore 
+from keras.models import model_from_json, load_model # type: ignore 
 from keras.models import Sequential #type: ignore
-
-class CustomSequential(Sequential):
-    pass
 
 file_path = r'.\staticfiles\patients_data.json'
 
@@ -22,11 +19,7 @@ IMAGE_SIZE = [176,208]
 
 class AIModel:
     def __init__(self):
-        json_file = open('model_mri.json', 'r')
-        model_json = json_file.read()
-        json_file.close()
-        model = model_from_json(model_json, custom_objects={'CustomSequential': CustomSequential})
-        model.load_weights("model_mri.h5")
+        self.model = load_model('mri_modelll.h5')
     
     @staticmethod
     def load_image(fname):
@@ -49,8 +42,8 @@ class AIModel:
         prediction = self.model.predict(img)
         prediction = np.squeeze(prediction)
         prediction = np.argmax(prediction)
-        print("img :: ", img)
-        return prediction
+        # print("img :: ", img)
+        return ['NonDemented', 'VeryMild', 'Mild', 'Moderate'][prediction]
 
 class TextModel:
     def __init__(self):
@@ -70,9 +63,11 @@ def upload_and_predict(request):
         
         model = AIModel()
         # image save to django data base 
-        file_name = default_storage.save(f'{PID}_{uploaded_file.name}', ContentFile(uploaded_file.read()))
-        uploaded_file_url = default_storage.url(file_name)
+        if not default_storage.exists(f'{PID}_{uploaded_file.name}'):
+            file_name = default_storage.save(f'{PID}_{uploaded_file.name}', ContentFile(uploaded_file.read()))
+        else: file_name = f'{PID}_{uploaded_file.name}'
         
+        uploaded_file_url = default_storage.url(file_name)
         prediction = model.predict(uploaded_file,PID)
         
         result = {'prediction': prediction,'file':uploaded_file_url}
