@@ -10,8 +10,8 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 from .models import Patients
 import numpy as np
 import cv2 as cv
-from keras.models import model_from_json, load_model # type: ignore 
-from keras.models import Sequential #type: ignore
+import joblib,xgboost # type: ignore
+from keras.models import load_model # type: ignore 
 
 file_path = r'.\staticfiles\patients_data.json'
 
@@ -47,13 +47,16 @@ class AIModel:
 
 class TextModel:
     def __init__(self):
-        self.model = ""
+        with open('model.joblib.dat', 'rb') as file:
+            self.model = joblib.load(file)
+        
+        print(self.model)
 
     def predict(self, data:pd.DataFrame):
         pred = self.model.predict(data)
         pred = np.argmax(pred)
-        
-        return 'Text prediction '
+        print(pred)
+        return 'Text prediction'
 
 @csrf_exempt
 def upload_and_predict(request):
@@ -83,6 +86,7 @@ def patients(request):
         patiens = Patients.objects.filter(user_id=user_id)
         return JsonResponse(list(patiens.values()),safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 
 @csrf_exempt
@@ -120,7 +124,6 @@ def patient_data(request):
             with open(file_path, 'r') as json_file:
                 return JsonResponse(json.load(json_file).get(PID), status=200, safe=False)
         
-            
         
         hypertension = data.get('hypertension')
         cholestrol_total = data.get('cholestrol_total')
@@ -165,3 +168,28 @@ def patient_data(request):
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
+@csrf_exempt
+def text_class(request):
+    if request.method == 'POST':
+        data = request.POST
+        model = TextModel()
+        
+        df = pd.DataFrame(data, columns=['PID','FunctionalAssessment', 'ADL', 'MMSE', 'CholesterolTotal', 'CholesterolHDL', 'BMI', 'DietQuality', 'MemoryComplaints', 'BehavioralProblems', 'CholesterolTriglycerides', 'AlcoholConsumption', 'SleepQuality','PhysicalActivity','CholesterolLDL'],index=[0])
+        df.drop('PID',axis=1,inplace=True)
+        df['Age'] = 20
+        
+        lis = ['BMI','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','CholesterolTriglycerides','CholesterolLDL','FunctionalAssessment','ADL','MMSE','CholesterolTotal','CholesterolHDL','Age']
+        
+        from sklearn.preprocessing import MinMaxScaler
+        scaler=MinMaxScaler()
+        
+        df[lis]=scaler.fit_transform(df[lis])
+        df['MemoryComplaints'] = df['MemoryComplaints'].astype(int)
+        df['BehavioralProblems'] = df['BehavioralProblems'].astype(int)
+        
+        cols = ['FunctionalAssessment', 'ADL', 'MMSE', 'MemoryComplaints', 'BehavioralProblems', 'CholesterolHDL', 'BMI', 'CholesterolTotal', 'DietQuality', 'CholesterolTriglycerides', 'AlcoholConsumption', 'SleepQuality', 'PhysicalActivity', 'CholesterolLDL', 'Age']
+        
+        result = model.predict(df[cols])
+        return JsonResponse({'prediction': result}, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
