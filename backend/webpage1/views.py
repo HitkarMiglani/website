@@ -40,9 +40,7 @@ class AIModel:
         img = self.load_image(st)
         
         prediction = self.model.predict(img)
-        prediction = np.squeeze(prediction)
-        prediction = np.argmax(prediction)
-        # print("img :: ", img)
+        prediction = np.argmax(np.squeeze(prediction))
         return ['NonDemented', 'VeryMild', 'Mild', 'Moderate'][prediction]
 
 class TextModel:
@@ -50,13 +48,12 @@ class TextModel:
         with open('model.joblib.dat', 'rb') as file:
             self.model = joblib.load(file)
         
-        print(self.model)
 
     def predict(self, data:pd.DataFrame):
         pred = self.model.predict(data)
         pred = np.argmax(pred)
-        print(pred)
-        return 'Text prediction'
+        if not pred: return "You Have A Chance Of Getting Alzheimer's Disease"
+        else: return "You Don't Have A Chance Of Getting Alzheimer's Disease" 
 
 @csrf_exempt
 def upload_and_predict(request):
@@ -185,11 +182,11 @@ def text_class(request):
         scaler=MinMaxScaler()
         
         df[lis]=scaler.fit_transform(df[lis])
-        df['MemoryComplaints'] = df['MemoryComplaints'].astype(int)
-        df['BehavioralProblems'] = df['BehavioralProblems'].astype(int)
+        df['MemoryComplaints'] = df['MemoryComplaints'].astype('Int32')
+        df['BehavioralProblems'] = df['BehavioralProblems'].astype('Int32')
         
         cols = ['FunctionalAssessment', 'ADL', 'MMSE', 'MemoryComplaints', 'BehavioralProblems', 'CholesterolHDL', 'BMI', 'CholesterolTotal', 'DietQuality', 'CholesterolTriglycerides', 'AlcoholConsumption', 'SleepQuality', 'PhysicalActivity', 'CholesterolLDL', 'Age']
         
-        result = model.predict(df[cols])
-        return JsonResponse({'prediction': result}, status=200)
+        result = str(model.predict(df[cols]))
+        return JsonResponse({'data': result}, status=200)
     return JsonResponse({'error': 'Invalid request'}, status=400)
