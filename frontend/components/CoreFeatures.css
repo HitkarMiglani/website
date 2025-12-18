@@ -1,0 +1,70 @@
+/* Container for both image and features list */
+.core-features-container {
+  display: flex;
+  justify-content: center;
+  padding: 6.5rem;
+  color: white; /*White text color for contrast*/
+  flex-wrap: wrap;
+  padding-left: 5rem;
+  align-items: center;
+}
+
+
+/* Left side image */
+.features-image img {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-right: 20px;
+}
+
+/* Right side features list */
+.features-list {
+  flex: 1;
+  padding: 20px;
+}
+
+.features-list h2 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.features-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.features-list li {
+  margin-bottom: 20px;
+}
+
+.features-list h3 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.features-list p {
+  font-size: 1em;
+  color: #ccc; /* Lighter color for description text */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .features-content {
+    flex-direction: column;
+  }
+
+  .features-image {
+    margin-bottom: 20px;
+  }
+
+  .features-list {
+    padding: 0;
+  }
+
+  .features-list h2 {
+    font-size: 2em;
+  }
+}

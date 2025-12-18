@@ -1,0 +1,63 @@
+.mri-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 50px auto;
+    margin-top: 0px;
+    padding: 20px;
+    color: #fff;
+  }
+  
+  .mri-image {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .mri-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .mri-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .mri-content h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  
+  .mri-feature {
+    margin-bottom: 20px;
+  }
+  
+  .mri-feature h3 {
+    font-size: 1.5em;
+    color: #ffa500;
+  }
+  
+  .mri-feature p {
+    font-size: 1em;
+    color: #ccc;
+  }
+  
+  /* Adjust layout for smaller screens */
+  @media (max-width: 768px) {
+    .mri-section {
+      flex-direction: column;
+    }
+  
+    .mri-content h2 {
+      font-size: 2em;
+    }
+  
+    .mri-feature h3 {
+      font-size: 1.2em;
+    }
+  }
+  
